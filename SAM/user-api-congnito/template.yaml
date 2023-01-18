@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  users-api-congnito
+
+  Sample SAM Template for users-api-congnito
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+  # tbkh8e5p4ribjia36b3hm1p61 dpq3g2cu05ooeeli7cqlegc7mkfmime81l34o3eleeqn4lk31lo ap-south-1_pLdn7qyTX
+
+Globals:
+  Function:
+    Timeout: 200
+    Runtime: java11
+    Architectures:
+      - x86_64
+    MemorySize: 512
+    Environment:
+      Variables:
+        MY_COGNITO_POOL_APP_CLIENT_ID: AQICAHi6VXSsIH7DU1kUaYPRvmIoarkDxZEyJKVhGry4a4UI3wGrhQKv+UMdxehXFn5O7KzeAAAAeDB2BgkqhkiG9w0BBwagaTBnAgEAMGIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMBdvL+gMe0VzdHuA+AgEQgDXo9eV/N4K1Ma62/iGQ6nMs4Cl7v1NFrYeh8tmMvGBQsEx5dBMSrUtc0BZnE2TqK0xtUsSedw==
+        MY_COGNITO_POOL_APP_CLIENT_SECRET: AQICAHi6VXSsIH7DU1kUaYPRvmIoarkDxZEyJKVhGry4a4UI3wEHYpMeSdH6CseY3SkRi1iyAAAAlTCBkgYJKoZIhvcNAQcGoIGEMIGBAgEAMHwGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMX9YN/xX/AtLwUG6ZAgEQgE/B8ESOfZ/A1mQ+xxnPGSp+A3Per44IhyF/6zVEf9WkzIBzQ0YvZn5klslC+I5Grh/2hK+gI+haenPSx/wmuTUYhootxky24KsQI55bddji
+        MY_COGNITO_POOL_ID: AQICAHi6VXSsIH7DU1kUaYPRvmIoarkDxZEyJKVhGry4a4UI3wEqfNa+naXjrP6Jm9iqpv3EAAAAczBxBgkqhkiG9w0BBwagZDBiAgEAMF0GCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM80yvkcAVXta06WuJAgEQgDBLZzxdE+atKnOVgRBvAobg9VAq+P7mTQb2zFb8NK6WTJeZVV2RMBftizK1G/q4fBw=
+Resources:
+  CreateUserHandlerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UsersAPICongnito
+      Handler: com.demo.aws.CreateUserHandler::handleRequest
+      Events:
+        CreateUserHandlerEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /users
+            Method: post
+  ConfirmUserHandlerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UsersAPICongnito
+      Handler: com.demo.aws.ConfirmUserHandler::handleRequest
+      Events:
+        ConfirmUserHandlerEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /confirm
+            Method: post
+  LoginUserHandlerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UsersAPICongnito
+      Handler: com.demo.aws.LoginUserHandler::handleRequest
+      Events:
+        LoginUserHandlerEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /login
+            Method: post
+  AddUserToGroupHandlerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UsersAPICongnito
+      Handler: com.demo.aws.AddUserToGroupHandler::handleRequest
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'cognito-idp:AdminAddUserToGroup'
+              Resource: "arn:aws:cognito-idp:ap-south-1:781874652364:userpool/ap-south-1_pLdn7qyTX"
+      Events:
+        AddUserToGroupHandlerEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /users/{userName}/add-to-group
+            Method: post
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  CreateUserHandler:
+    Description: "API Gateway endpoint URL for Prod stage for Cognito function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users"
+  CreateUserHandlerFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt CreateUserHandlerFunction.Arn
+  CreateUserHandlerFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt CreateUserHandlerFunctionRole.Arn

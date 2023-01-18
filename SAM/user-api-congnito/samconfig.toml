@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "users-api-congnito-sam"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-zuc2ipp0o3ws"
+s3_prefix = "users-api-congnito-sam"
+region = "ap-south-1"
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+image_repositories = []
