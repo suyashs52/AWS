@@ -1,0 +1,47 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "service-lamda-authorizer"
+host: "bcoqa7y1vj.execute-api.ap-south-1.amazonaws.com"
+basePath: "/Prod"
+schemes:
+- "https"
+paths:
+  /users/{userName}:
+    get:
+      parameters:
+      - name: "userName"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "Authorization"
+        in: "header"
+        required: true
+        type: "string"
+      responses: {}
+      security:
+      - UsersLambdaAuthorizer: []
+      x-amazon-apigateway-request-validator: "Validate query string parameters and\
+        \ headers"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:781874652364:function:service-lamda-authorizer-GetUserByUserNameFunction-IchFHOWhFQNx/invocations"
+        passthroughBehavior: "when_no_match"
+        type: "aws_proxy"
+securityDefinitions:
+  UsersLambdaAuthorizer:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+    x-amazon-apigateway-authtype: "custom"
+    x-amazon-apigateway-authorizer:
+      authorizerUri: "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:781874652364:function:service-lamda-authorizer-LambdaAuthorizerFunction-u5nWADMDKwpH/invocations"
+      authorizerResultTtlInSeconds: 0
+      identitySource: "method.request.header.Authorization"
+      type: "request"
+x-amazon-apigateway-request-validators:
+  Validate query string parameters and headers:
+    validateRequestParameters: true
+    validateRequestBody: false
+

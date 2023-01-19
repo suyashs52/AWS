@@ -1,5 +1,6 @@
 package com.demo.aws.service;
 
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.google.gson.JsonObject;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -18,6 +19,25 @@ public class CongnitoUserService {
     CongnitoUserService(CognitoIdentityProviderClient cognitoIdentityProviderClient){
         this.cognitoIdentityProviderClient=cognitoIdentityProviderClient;
     }
+
+
+    public JsonObject getUser(String accessToken){
+      GetUserRequest getUserRequest=  GetUserRequest.builder().accessToken(accessToken).build();
+      GetUserResponse getUserResponse= cognitoIdentityProviderClient.getUser(getUserRequest);
+      JsonObject getUserResult=new JsonObject();
+        getUserResult.addProperty("isSuccessful", getUserResponse.sdkHttpResponse().isSuccessful());
+        getUserResult.addProperty("statusCode", getUserResponse.sdkHttpResponse().statusCode());
+        List<AttributeType> userAttribute=getUserResponse.userAttributes();
+        JsonObject userDetail=new JsonObject();
+        userAttribute.stream().forEach((attributes)->{
+            userDetail.addProperty(attributes.name(),attributes.value());
+        });
+
+        getUserResult.add("user",userDetail);
+        return getUserResult;
+
+    }
+
 
     public JsonObject addUserToGroup(String groupName, String userName, String userPoolId){
         AdminAddUserToGroupRequest adminAddUserToGroupRequest = AdminAddUserToGroupRequest.builder()

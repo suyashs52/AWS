@@ -8,6 +8,6 @@ architecture = "x86_64"
 handler = "com.demo.aws.CreateUserHandler::handleRequest"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["CreateUserHandlerFunction", "ConfirmUserHandlerFunction", "LoginUserHandlerFunction", "AddUserToGroupHandlerFunction"]
+functions = ["CreateUserHandlerFunction", "ConfirmUserHandlerFunction", "LoginUserHandlerFunction", "AddUserToGroupHandlerFunction", "GetUserHandlerFunction"]
 
 [layer_build_definitions]

@@ -21,6 +21,15 @@ Globals:
         MY_COGNITO_POOL_APP_CLIENT_SECRET: AQICAHi6VXSsIH7DU1kUaYPRvmIoarkDxZEyJKVhGry4a4UI3wEHYpMeSdH6CseY3SkRi1iyAAAAlTCBkgYJKoZIhvcNAQcGoIGEMIGBAgEAMHwGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMX9YN/xX/AtLwUG6ZAgEQgE/B8ESOfZ/A1mQ+xxnPGSp+A3Per44IhyF/6zVEf9WkzIBzQ0YvZn5klslC+I5Grh/2hK+gI+haenPSx/wmuTUYhootxky24KsQI55bddji
         MY_COGNITO_POOL_ID: AQICAHi6VXSsIH7DU1kUaYPRvmIoarkDxZEyJKVhGry4a4UI3wEqfNa+naXjrP6Jm9iqpv3EAAAAczBxBgkqhkiG9w0BBwagZDBiAgEAMF0GCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM80yvkcAVXta06WuJAgEQgDBLZzxdE+atKnOVgRBvAobg9VAq+P7mTQb2zFb8NK6WTJeZVV2RMBftizK1G/q4fBw=
 Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml
   CreateUserHandlerFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -32,6 +41,8 @@ Resources:
           Properties:
             Path: /users
             Method: post
+            RestApiId:
+              Ref: MyApi
   ConfirmUserHandlerFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -43,6 +54,8 @@ Resources:
           Properties:
             Path: /confirm
             Method: post
+            RestApiId:
+              Ref: MyApi
   LoginUserHandlerFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -54,6 +67,8 @@ Resources:
           Properties:
             Path: /login
             Method: post
+            RestApiId:
+              Ref: MyApi
   AddUserToGroupHandlerFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -72,6 +87,21 @@ Resources:
           Properties:
             Path: /users/{userName}/add-to-group
             Method: post
+            RestApiId:
+              Ref: MyApi
+  GetUserHandlerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: UsersAPICongnito
+      Handler: com.demo.aws.GetUserHandler::handleRequest
+      Events:
+        GetUserHandlerEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /users/me
+            Method: get
+            RestApiId:
+              Ref: MyApi
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -79,7 +109,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   CreateUserHandler:
     Description: "API Gateway endpoint URL for Prod stage for Cognito function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users"
   CreateUserHandlerFunction:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt CreateUserHandlerFunction.Arn

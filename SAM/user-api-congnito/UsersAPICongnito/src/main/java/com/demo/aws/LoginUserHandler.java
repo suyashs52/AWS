@@ -44,6 +44,10 @@ public class LoginUserHandler implements RequestHandler<APIGatewayProxyRequestEv
         LambdaLogger logger=context.getLogger();
 
         try {
+            logger.log("appClientSecret:"+appClientSecret);
+            logger.log("appClientId:"+appCliendId);
+
+
             JsonObject loginResult=  congnitoUserService.userLogin(loginDetail,appCliendId,appClientSecret);
 
             return     response.withStatusCode(200)
@@ -53,7 +57,7 @@ public class LoginUserHandler implements RequestHandler<APIGatewayProxyRequestEv
             logger.log(ex.awsErrorDetails().errorMessage());
             ErrorResponse errorResponse=new ErrorResponse(ex.awsErrorDetails().errorMessage());
 
-          return   response.withStatusCode(500).withBody( new Gson().toJson(errorResponse,JsonObject.class));
+          return   response.withStatusCode(500).withBody( new Gson().toJson(errorResponse,ErrorResponse.class));
         }catch (Exception ex){
             logger.log(ex.getMessage());
             ErrorResponse errorResponse=new ErrorResponse(ex.getMessage());

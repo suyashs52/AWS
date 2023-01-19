@@ -1,0 +1,55 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "users-api-congnito-sam"
+host: "4hszip4up0.execute-api.ap-south-1.amazonaws.com"
+basePath: "/Prod"
+schemes:
+- "https"
+paths:
+  /confirm:
+    post:
+      responses: {}
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:781874652364:function:users-api-congnito-sam-ConfirmUserHandlerFunction-ZTJRRZ44Qu6i/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+  /login:
+    post:
+      responses: {}
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:781874652364:function:users-api-congnito-sam-LoginUserHandlerFunction-g4rq23rq5niD/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+  /users:
+    post:
+      responses: {}
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:781874652364:function:users-api-congnito-sam-CreateUserHandlerFunction-pUUZRtJqNcvX/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+  /users/me:
+    get:
+      responses: {}
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:781874652364:function:users-api-congnito-sam-GetUserHandlerFunction-UJHHcf7AhyaZ/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+  /users/{userName}/add-to-group:
+    post:
+      parameters:
+      - name: "userName"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:781874652364:function:users-api-congnito-sam-AddUserToGroupHandlerFuncti-SNiakTJJSci2/invocations"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"

@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Service Lambda Authorizer
+
+  Sample SAM Template for  LambdaAuthorizer Function
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 200
+    Architectures:
+    - x86_64
+    MemorySize: 512
+    Runtime: java11
+    Environment:
+      Variables:
+        APP_USERS_POOL_ID: ap-south-1_pLdn7qyTX
+        APP_USERS_APP_CLIENT_ID: tbkh8e5p4ribjia36b3hm1p61
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: open-api.yaml
+  GetUserByUserNameFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: LambdaAuthorizer
+      Handler: com.aws.lambda.GetUserByUserNameHandler::handleRequest
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'cognito-idp:AdminGetUser'
+              Resource: "arn:aws:cognito-idp:ap-south-1:781874652364:userpool/ap-south-1_pLdn7qyTX"
+      Events:
+        GetUserByUserName:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /users/{userName}
+            Method: get
+            RestApiId:
+              Ref: MyApi
+  LambdaAuthorizerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: LambdaAuthorizer
+      Handler: com.aws.authorizer.LambdaAuthorizer::handleRequest
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  GetUserByUserNameApi:
+    Description: API Gateway endpoint URL for Prod stage for ErrorResponseAPI
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users"
+  GetUserByUserNameFunction:
+    Description: LambdaAuthorizer Lambda Function ARN
+    Value: !GetAtt GetUserByUserNameFunction.Arn
+  GetUserByUserNameFunctionIamRole:
+    Description: Implicit IAM Role created for LambdaAuthorizer
+    Value: !GetAtt GetUserByUserNameFunctionRole.Arn
