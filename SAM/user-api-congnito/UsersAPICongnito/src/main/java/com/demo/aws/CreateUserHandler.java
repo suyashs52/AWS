@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.demo.aws.service.CongnitoUserService;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
@@ -25,6 +26,13 @@ public class CreateUserHandler implements RequestHandler<APIGatewayProxyRequestE
     private final CongnitoUserService congnitoUserService;
     private final String appCliendId;
     private final String appClientSecret;
+
+    public CreateUserHandler(CongnitoUserService congnitoUserService, String appCliendId, String appClientSecret) {
+        this.congnitoUserService = congnitoUserService;
+        this.appCliendId = appCliendId;
+        this.appClientSecret = appClientSecret;
+    }
+
     public CreateUserHandler(){
         this.congnitoUserService=new CongnitoUserService(System.getenv("AWS_REGION"));
         this.appCliendId= Utils.decryptKey("MY_COGNITO_POOL_APP_CLIENT_ID");
@@ -44,9 +52,10 @@ public class CreateUserHandler implements RequestHandler<APIGatewayProxyRequestE
         LambdaLogger logger=context.getLogger();
         logger.log("Original JSON Body:"+requestBody);
 
-        JsonObject userDetails=JsonParser.parseString(requestBody).getAsJsonObject();
+        JsonObject userDetails=null;
 
         try {
+            userDetails=JsonParser.parseString(requestBody).getAsJsonObject();
             JsonObject createUserResult= congnitoUserService.createUser(userDetails,appCliendId,appClientSecret);
         return     response.withStatusCode(200)
                     .withBody(new Gson().toJson(createUserResult,JsonObject.class));
@@ -54,6 +63,12 @@ public class CreateUserHandler implements RequestHandler<APIGatewayProxyRequestE
         }catch (AwsServiceException ex){
             logger.log(ex.awsErrorDetails().errorMessage());
           return   response.withStatusCode(500).withBody(ex.awsErrorDetails().errorMessage());
+        }catch (Exception ex){
+            logger.log(ex.getMessage());
+            ErrorResponse errorResponse=new ErrorResponse(ex.getMessage());
+            //sereialize when null too don't use  new Gson().toJson(errorResponse,JsonObject.class)
+            String erorResponseJson=new GsonBuilder().serializeNulls().create().toJson(errorResponse,ErrorResponse.class);
+            return   response.withBody(erorResponseJson).withStatusCode(500);
         }
 
 

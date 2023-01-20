@@ -1,6 +1,7 @@
 package com.demo.aws.service;
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import com.demo.aws.shared.Constants;
 import com.google.gson.JsonObject;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -132,10 +133,10 @@ public class CongnitoUserService {
 
        SignUpResponse signUpResponse= cognitoIdentityProviderClient.signUp(signUpRequest);
         JsonObject createUserDetail=new JsonObject();
-        createUserDetail.addProperty("isSuccessful",signUpResponse.sdkHttpResponse().isSuccessful());
-        createUserDetail.addProperty("statusCode",signUpResponse.sdkHttpResponse().statusCode());
-        createUserDetail.addProperty("congonitoUserId",signUpResponse.userSub());
-        createUserDetail.addProperty("isConfirmed",signUpResponse.userConfirmed());
+        createUserDetail.addProperty(Constants.IS_SUCCESSFUL,signUpResponse.sdkHttpResponse().isSuccessful());
+        createUserDetail.addProperty(Constants.STATUS_CODE,signUpResponse.sdkHttpResponse().statusCode());
+        createUserDetail.addProperty(Constants.CONGITO_USER_ID,signUpResponse.userSub());
+        createUserDetail.addProperty(Constants.IS_CONFIRMED,signUpResponse.userConfirmed());
         return createUserDetail;
     }
 
